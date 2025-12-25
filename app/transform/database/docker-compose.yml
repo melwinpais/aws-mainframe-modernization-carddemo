@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.9
+    container_name: carddemo-postgres
+    environment:
+      POSTGRES_DB: carddemo
+      POSTGRES_USER: carddemo_user
+      POSTGRES_PASSWORD: carddemo_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carddemo_user -d carddemo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carddemo-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  carddemo-network:
+    driver: bridge
